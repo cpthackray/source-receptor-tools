@@ -1,6 +1,6 @@
 # source-receptor-tools
 
-(See included PFAS example)
+[(See included PFAS example)](pfas_example.ipynb)
 
 ## Requirements
  - xarray
