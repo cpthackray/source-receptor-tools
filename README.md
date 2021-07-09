@@ -1,12 +1,15 @@
 # source-receptor-tools
 
 [(See included PFAS example)](pfas_example.ipynb)
+### NOTE: Included data is for illustrative purposes only!
+<br />
+<br />
 
-## Requirements
+# Requirements
  - xarray
  - numpy
 
-## Metadata Structure
+# Metadata Structure
 
 Based on tree structure:
 
