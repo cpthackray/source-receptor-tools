@@ -13,6 +13,17 @@
  
 <br />
 
+# Installation
+## Using pip
+```bash
+$ pip install git+https://github.com/cpthackray/source-receptor-tools
+$ python
+```
+
+```python
+>>> import srtools
+```
+
 # Metadata Structure
 
 Based on tree structure:
