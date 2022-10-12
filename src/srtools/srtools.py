@@ -129,3 +129,39 @@ class InfluenceFunction(object):
         for source, s in source_dict.items():
             exposure += self.get_IF(source, species, pathway) * s
         return exposure
+
+    def lonlat_to_ij(self, lon, lat):
+        lons, lats = self.get_lonslats()
+        j = np.argmin(abs(lon - lons))
+        i = np.argmin(abs(lat - lats))
+        return i, j
+
+    def exposure_at_locations(self, source_dict, species, pathway, locations):
+        """Get exposure for specific lon/lat pairs."""
+        exposure_map = self.get_species_exposure(source_dict=source_dict, species=species, pathway=pathway)
+        exposures = np.zeros(len(locations))
+        for iloc, (lon, lat) in enumerate(locations):
+            i, j = self.lonlat_to_ij(lon, lat)
+            exposures[iloc] = exposure_map[i,j]
+        return exposures
+
+    def fill_dataframe(self, df, source_dict, species_pathway_list,
+                        latname = 'latitude', lonname = 'longitude'):
+        """Fill dataframe that has locations with listed (species, pathway) pairs."""
+        locations = [(lon, lat) for lon, lat in zip(df[lonname].values, df[latname].values)]
+        for spc, pathway in species_pathway_list:
+            exposures = self.exposure_at_locations(source_dict=source_dict, species=spc, 
+                                                    pathway=pathway, locations=locations)
+            df[f'{spc}_{pathway}'] = exposures
+        return df
+
+    def fill_netcdf(self, source_dict, species_pathway_list, filename):
+        dv = {}
+        for spc, pw in species_pathway_list:
+            arr = self.get_species_exposure(source_dict=source_dict, species=spc, pathway=pw)
+            dv[f'{spc}_{pw}'] = (('time','lat','lon'),np.expand_dims(arr,0))
+        ds = xr.Dataset(data_vars=dv,
+                    coords={'lat':(('lat'),self.get_latitudes()),
+                            'lon':(('lon'),self.get_longitudes()),
+                            'time':(('time'),[0.0])})
+        ds.to_netcdf(filename)
